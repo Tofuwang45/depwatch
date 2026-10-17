@@ -1,0 +1,35 @@
+{
+  "name": "depwatch",
+  "version": "0.0.0",
+  "type": "module",
+  "imports": {
+    "#*": "./agent/*",
+    "#evals/*": "./evals/*"
+  },
+  "scripts": {
+    "build": "eve build",
+    "deploy": "eve deploy",
+    "dev": "eve dev",
+    "eval": "eve eval",
+    "start": "eve start",
+    "typecheck": "tsc",
+    "test": "node --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@vercel/connect": "2.5.2",
+    "ai": "^7.0.137",
+    "eve": "^0.80.1",
+    "just-bash": "^3.1.0",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "24.x",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": "24.x"
+  },
+  "license": "Apache-2.0",
+  "description": "Open-source eve agent that watches npm dependencies for vulnerabilities and outdated packages.",
+  "private": true
+}
