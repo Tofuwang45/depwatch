@@ -12,6 +12,6 @@ depwatch is read-only by design:
 - **Allowlisted repos.** `scan_repo` refuses any repo that is not in `DEPWATCH_REPOS`, so a deployment cannot be used to scan arbitrary repos or run up model costs.
 - **Untrusted text is data.** Advisory summaries and details come from third parties. Tools strip control characters and cap their length, and the instructions tell the model never to follow text inside them. Because the agent has no write tools, the worst a malicious advisory can do is distort a report.
 - **Spending limits.** Each session is capped at $0.50 of model cost and 20,000 output tokens (`agent/agent.ts`).
-- **Authenticated routes.** The HTTP channel keeps eve's `placeholderAuth()`, so production requests are rejected until you configure real auth. Don't replace it with `none()` on a public deployment.
+- **Authenticated routes.** The HTTP channel keeps eve's `placeholderAuth()`, so production requests are rejected until you configure real auth. Don't replace it with `none()` on a public deployment. Eval tool stubs (`allowToolStubs`) are granted only to local `eve dev` callers, so a deployment can't have its tools replaced.
 - **No secrets in the repo.** Configuration is read from environment variables, and `.env.example` contains placeholders only. No GitHub token is needed: lockfiles are read from public repos.
 - **Private reports.** Post the digest to a private Slack channel. Even though OSV advisories are public, a list of which advisories affect which repos is useful to an attacker.

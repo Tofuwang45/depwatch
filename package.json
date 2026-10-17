@@ -13,9 +13,11 @@
     "eval": "eve eval",
     "start": "eve start",
     "typecheck": "tsc",
-    "test": "node --test test/*.test.ts"
+    "test": "node --test test/*.test.ts",
+    "benchmark": "node scripts/benchmark.ts"
   },
   "dependencies": {
+    "@ai-sdk/openai-compatible": "^3.0.71",
     "@vercel/connect": "2.5.2",
     "ai": "^7.0.137",
     "eve": "^0.80.1",
