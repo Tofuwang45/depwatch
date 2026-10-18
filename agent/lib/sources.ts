@@ -1,6 +1,6 @@
 import type { InstalledPackage } from "./lockfile.ts";
 import { compareVersions } from "./semver.ts";
-import { cleanUntrustedText } from "./untrusted.ts";
+import { cleanUntrustedText, looksLikeInstructions } from "./untrusted.ts";
 
 export type Fetch = typeof fetch;
 
@@ -19,6 +19,8 @@ export interface Advisory {
   /** Lowest fixed version at or above the installed one, if OSV knows it. */
   fixedIn?: string;
   url: string;
+  /** Set when the summary or details read like instructions to the agent. */
+  suspicious?: true;
 }
 
 /** Downloads package-lock.json from a public repo's default branch. */
@@ -90,14 +92,17 @@ export async function getAdvisory(
   const response = await fetchImpl(`${OSV_API}/vulns/${encodeURIComponent(id)}`);
   if (!response.ok) throw new Error(`OSV lookup for ${id} failed with HTTP ${response.status}.`);
   const vuln = (await response.json()) as OsvVuln;
+  const summary = cleanUntrustedText(vuln.summary);
+  const details = cleanUntrustedText(vuln.details, 1500);
   return {
     id: vuln.id,
     aliases: (vuln.aliases ?? []).filter((alias) => /^[A-Z]+-[\w-]+$/.test(alias)).slice(0, 5),
-    summary: cleanUntrustedText(vuln.summary),
-    details: cleanUntrustedText(vuln.details, 1500),
+    summary,
+    details,
     severity: normalizeSeverity(vuln.database_specific?.severity),
     fixedIn: pkg ? findFixedVersion(vuln, pkg.name, pkg.version) : undefined,
     url: `https://osv.dev/vulnerability/${encodeURIComponent(vuln.id)}`,
+    ...(looksLikeInstructions(`${summary} ${details}`) && { suspicious: true as const }),
   };
 }
 

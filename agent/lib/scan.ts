@@ -17,6 +17,8 @@ export interface Finding {
   direct: boolean;
   advisory: Advisory;
   priority: Priority;
+  /** The exact fix to quote, so the model never has to compose a command. */
+  remediation: string;
 }
 
 export interface Outdated {
@@ -60,6 +62,17 @@ export function prioritize(pkg: Pick<InstalledPackage, "dev" | "direct">, adviso
   return "low";
 }
 
+/**
+ * Spells out the fix for a finding: an install command for a direct dependency,
+ * an `overrides` entry for a transitive one, or a plain statement that no fix
+ * has shipped.
+ */
+export function remediation(pkg: Pick<InstalledPackage, "name" | "direct">, fixedIn: string | undefined): string {
+  if (!fixedIn) return "No fixed version yet";
+  if (pkg.direct) return `npm install ${pkg.name}@${fixedIn}`;
+  return `Add to package.json: "overrides": { ${JSON.stringify(pkg.name)}: ${JSON.stringify(fixedIn)} }, or upgrade the package that depends on it`;
+}
+
 const PRIORITY_ORDER: Record<Priority, number> = { "act-now": 0, plan: 1, low: 2 };
 
 export async function scanRepo(repo: string, fetchImpl: Fetch = fetch): Promise<ScanReport> {
@@ -79,6 +92,7 @@ export async function scanRepo(repo: string, fetchImpl: Fetch = fetch): Promise<
         direct: pkg.direct,
         advisory,
         priority: prioritize(pkg, advisory),
+        remediation: remediation(pkg, advisory.fixedIn),
       } satisfies Finding;
     }),
   );
