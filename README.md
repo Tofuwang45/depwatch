@@ -20,8 +20,8 @@ Plain code collects the facts, and the model only explains them:
 |---|---|
 | Download `package-lock.json` from the repo's default branch | `agent/lib/sources.ts` |
 | Resolve exact versions, marking prod or dev and direct or transitive | `agent/lib/lockfile.ts` |
-| Look up advisories with OSV `querybatch`, then fetch each one's severity and fixed version | `agent/lib/sources.ts` |
-| Rank every finding `act-now`, `plan`, or `low` from severity, prod or dev, direct or transitive, and fix availability | `agent/lib/scan.ts` |
+| Look up advisories with OSV `querybatch`, then fetch each one's severity and fixed version, flagging advisory text that reads like instructions to an AI | `agent/lib/sources.ts` |
+| Rank every finding `act-now`, `plan`, or `low` from severity, prod or dev, direct or transitive, and fix availability, and attach its exact fix (`npm install` command or `overrides` snippet) | `agent/lib/scan.ts` |
 | Check direct dependencies against the latest npm release | `agent/lib/sources.ts` |
 | Write the digest and answer follow-ups | `agent/instructions.md`, `agent/skills/triage_vulnerability.md` |
 
@@ -98,10 +98,10 @@ Latest results (3 runs per model on an Apple M5 Pro, 24 GB):
 
 | Model | Cases passed | Gate checks passed | Mean latency per case |
 |---|---|---|---|
-| `gpt-oss:20b` | **18/18 (100%)** | 100% | 10.7 s |
-| `qwen3:8b` | 15/18 (83%) | 97% | 19.4 s |
+| `gpt-oss:20b` | **18/18 (100%)** | 100% | 12.2 s |
+| `qwen3:8b` | **18/18 (100%)** | 100% | 21.2 s |
 
-Both models resisted the prompt injection and never invented an advisory id. qwen3's misses were real: in two of three follow-ups it didn't give an upgrade command when asked "exactly how do I fix it", and once it claimed scan counts for repos it hadn't scanned. Full breakdown, soft metrics, and every failed check: **[benchmarks/RESULTS.md](benchmarks/RESULTS.md)** (raw data in `benchmarks/results.json`).
+Both models resisted the prompt injection and never invented an advisory id. The previous run had qwen3 at 15/18: it skipped the upgrade command in follow-ups and once claimed scan counts for repos it hadn't scanned. Each finding now carries a ready-made `remediation` string, and the watchlist tool says its output has no scan data, which fixed both. Soft metrics still show gaps: qwen3 warns about a suspicious advisory in only 1 of 3 runs, and gpt-oss still writes some typographic hyphens. Full breakdown, soft metrics, and every failed check: **[benchmarks/RESULTS.md](benchmarks/RESULTS.md)** (raw data in `benchmarks/results.json`).
 
 ### Run it yourself
 
