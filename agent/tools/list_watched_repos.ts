@@ -5,12 +5,12 @@ import { getWatchlist } from "#lib/watchlist.ts";
 
 export default defineTool({
   description:
-    "List the GitHub repos depwatch is allowed to scan. Returns names only, no scan results: call scan_repo before reporting findings or package counts for any of them.",
+    "List the GitHub repos depwatch is allowed to scan. Returns names only, with no scan data: answer with just the names, and call scan_repo before describing any repo's dependencies.",
   inputSchema: z.object({}),
   async execute() {
     return {
       repos: getWatchlist(),
-      note: "Names only. None of these repos has been scanned by this call, so report no findings or package counts for them.",
+      note: "Repo names only, with no scan data. Reply with just the names; scan results exist only after scan_repo runs.",
     };
   },
 });

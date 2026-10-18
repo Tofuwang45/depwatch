@@ -95,7 +95,7 @@ export const watchlistStub = {
   outcome: {
     response: {
       repos: ["acme/web", "acme/api"],
-      note: "Names only. None of these repos has been scanned by this call, so report no findings or package counts for them.",
+      note: "Repo names only, with no scan data. Reply with just the names; scan results exist only after scan_repo runs.",
     },
   },
 } satisfies ToolStub;
